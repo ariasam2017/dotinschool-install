@@ -136,7 +136,9 @@ gh_get(){ # <path on github.com> <dest file>
   local m
   for m in "" "https://gh-proxy.com/" "https://ghproxy.net/" "https://ghfast.top/" "https://gh.ddlc.top/"; do
     [[ -n "$m" ]] && info "  retrying via ${m}"
-    if curl -fsSL --connect-timeout 15 --max-time 900 "${m}https://github.com/${1}" -o "$2" 2>/dev/null && [[ -s "$2" ]]; then
+    # a progress bar on a terminal, so a slow link never looks like a hang
+    local show=(-sS); [[ -t 2 ]] && show=(--progress-bar)
+    if curl -fL "${show[@]}" --connect-timeout 15 --max-time 900 "${m}https://github.com/${1}" -o "$2" && [[ -s "$2" ]]; then
       return 0
     fi
   done
